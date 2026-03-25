@@ -1,40 +1,86 @@
 -- nvim-ide/init.lua
 vim.g.mapleader = " "
 
--- 1. Bootstrapping Lazy.nvim
+-- Lazy.nvim Bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
-  vim.fn.system({
-    "git", "clone", "--filter=blob:none",
-    "https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath,
-  })
+  vim.fn.system({"git", "clone", "--filter=blob:none", "https://github.com/folke/lazy.nvim.git", "--branch=stable", lazypath})
 end
 vim.opt.rtp:prepend(lazypath)
 
--- 2. Plugins
+-- Plugins
 require("lazy").setup({
-  -- UI & Theme
+  -- UI
   { "catppuccin/nvim", name = "catppuccin", priority = 1000 },
   { "nvim-lualine/lualine.nvim", dependencies = { "nvim-tree/nvim-web-devicons" } },
-  
-  -- Navigation
   { "nvim-neo-tree/neo-tree.nvim", branch = "v3.x", dependencies = { "nvim-lua/plenary.nvim" } },
-  { "nvim-telescope/telescope.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
 
-  -- LSP & Treesitter
+  -- LSP CORE
+  {
+    "neovim/nvim-lspconfig",
+    dependencies = {
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+      "hrsh7th/cmp-nvim-lsp", -- Джерело LSP для автодоповнення
+    },
+  },
+
+  -- Autocompletion Engine
+  {
+    "hrsh7th/nvim-cmp",
+    dependencies = {
+      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip",
+    },
+  },
+
+  -- Treesitter (Highlighting)
   { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
-  { "neovim/nvim-lspconfig" },
-  { "williamboman/mason.nvim", build = ":MasonUpdate" }, -- Менеджер серверів
 })
 
--- 3. Basic Settings
+-- 3. LSP & Mason Setup
+require("mason").setup()
+require("mason-lspconfig").setup({
+  -- Сервери для стеку
+  ensure_installed = { "pyright", "ts_ls", "dockerls", "lua_ls" },
+})
+
+local lspconfig = require("lspconfig")
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+-- Налаштування конкретних серверів
+local servers = { "pyright", "ts_ls", "dockerls", "lua_ls" }
+for _, lsp in ipairs(servers) do
+  lspconfig[lsp].setup({
+    capabilities = capabilities,
+  })
+end
+
+-- Completion Config (CMP)
+local cmp = require("cmp")
+cmp.setup({
+  snippet = { expand = function(args) require("luasnip").lsp_expand(args.body) end },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<CR>'] = cmp.mapping.confirm({ select = true }),
+  }),
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' },
+  }, {
+    { name = 'buffer' },
+  })
+})
+
+-- Основні гарячі клавіші для LSP
+vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {}) -- Перейти до визначення
+vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})       -- Документація під курсором
+vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, {}) -- Code Actions
+vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, {})      -- Перейменувати змінну
+
+-- Дизайн
 vim.cmd.colorscheme("catppuccin")
 vim.opt.number = true
 vim.opt.relativenumber = true
-vim.opt.shiftwidth = 4
-vim.opt.tabstop = 4
-vim.opt.expandtab = true
-
--- Keymaps
-vim.keymap.set('n', '<leader>e', ':Neotree toggle<CR>')
-vim.keymap.set('n', '<leader>ff', ':Telescope find_files<CR>')

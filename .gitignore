@@ -4,3 +4,9 @@ undo/
 spell/
 shada/
 swap/
+undodir/
+site/
+view/
+lazy-lock.json
+plugin/
+*.swp
