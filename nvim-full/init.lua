@@ -1,4 +1,3 @@
--- nvim-ide/init.lua
 vim.g.mapleader = " "
 
 -- Lazy.nvim Bootstrap
@@ -21,7 +20,7 @@ require("lazy").setup({
     dependencies = {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
-      "hrsh7th/cmp-nvim-lsp", -- Джерело LSP для автодоповнення
+      "hrsh7th/cmp-nvim-lsp",
     },
   },
 
@@ -38,7 +37,12 @@ require("lazy").setup({
   { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
 })
 
--- 3. LSP & Mason Setup
+-- Treesitter config
+require('nvim-treesitter.configs').setup({
+  ensure_installed = { "lua", "python", "javascript", "typescript", "tsx", "bash", "dockerfile", "yaml" },
+  highlight = { enable = true },
+})
+
 require("mason").setup()
 require("mason-lspconfig").setup({
   -- Сервери для стеку
@@ -51,9 +55,7 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities()
 -- Налаштування конкретних серверів
 local servers = { "pyright", "ts_ls", "dockerls", "lua_ls" }
 for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup({
-    capabilities = capabilities,
-  })
+  lspconfig[lsp].setup({ capabilities = capabilities })
 end
 
 -- Completion Config (CMP)

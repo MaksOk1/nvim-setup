@@ -6,10 +6,14 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-# Імпорт логіки встановлення бінарника
-source ./scripts/manage_nvim_bin.sh
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Перевірка версії nvim перед початком
+source "$SCRIPT_DIR/scripts/manage_deps.sh"
+source "$SCRIPT_DIR/scripts/manage_nvim_bin.sh"
+
+echo -e "${GREEN}=== Початок встановлення ===${NC}"
+
+check_and_install_deps
 check_and_install_nvim
 
 TARGET="$HOME/.config/nvim"
@@ -50,11 +54,12 @@ done
 
 # Створення симлінка (використовуємо повний шлях через readlink)
 SOURCE_DIR="$(cd "$(dirname "$0")" && pwd)/$CONF"
+# SOURCE_DIR="$SCRIPT_DIR/$CONF"
 
 if [ -d "$SOURCE_DIR" ]; then
     ln -s "$SOURCE_DIR" "$TARGET"
     echo -e "${GREEN}Успішно встановлено $CONF!${NC}"
-    echo "Запускай 'nvim', щоб ініціалізувати плагіни."
+    echo "Можеш запускати 'nvim'!"
 else
     echo -e "${RED}Помилка: Папка $SOURCE_DIR не знайдена!${NC}"
     exit 1
