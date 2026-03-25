@@ -37,12 +37,20 @@ require("lazy").setup({
   { 
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    config = function()
-      local configs = require('nvim-treesitter.configs')
-      configs.setup({
-        ensure_installed = { "lua", "python", "javascript", "typescript", "tsx", "bash", "dockerfile", "yaml" },
-        highlight = { enable = true },
-      })
+    opts = {
+      ensure_installed = { "lua", "python", "javascript", "typescript", "tsx", "bash", "dockerfile", "yaml" },
+      highlight = { enable = true },
+    },
+    config = function(_, opts)
+      -- Використовуємо pcall, щоб Neovim не падав, якщо плагін ще не завантажився
+      local status, ts = pcall(require, "nvim-treesitter.configs")
+      if status then
+        ts.setup(opts)
+      else
+        -- У нових версіях Treesitter може працювати автоматично через opts
+        -- або потребує лише завантаження основного модуля
+        require("nvim-treesitter").setup(opts)
+      end
     end
   },
 })
@@ -68,7 +76,11 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities()
 local servers = { "pyright", "ts_ls", "dockerls", "lua_ls" }
 
 for _, lsp in ipairs(servers) do
-  local opts = { capabilities = capabilities }
+  local opts = { 
+    capabilities = capabilities,
+    -- Автоматичний запуск (замiсть lspconfig.setup)
+    autostart = true,
+ }
   
   if lsp == "lua_ls" then
     opts.settings = {
@@ -82,10 +94,6 @@ for _, lsp in ipairs(servers) do
   -- Замість require('lspconfig')[lsp].setup(opts)
   -- Використовуємо вбудований метод, щоб уникнути Deprecation Warning
   vim.lsp.config(lsp, opts)
-
-  -- Активація (якщо lspconfig завантажений)
-  local status, lspconfig = pcall(require, "lspconfig")
-  if status then lspconfig[lsp].setup(opts) end
 end
 
 -- Completion Config (CMP)
