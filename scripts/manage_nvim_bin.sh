@@ -18,7 +18,7 @@ check_and_install_nvim() {
 
         if [ "$(printf '%s\n%s' "$REQUIRED_VER" "$CURRENT_VER" | sort -V | head -n1)" != "$REQUIRED_VER" ]; then
             echo -e "${RED}Увага: Версія Neovim нижче за $REQUIRED_VER!${NC}"
-            read -p "Встановити Neovim Nightly? (y/n): " confirm
+            read -p "Встановити Neovim Nightly? (y/N): " confirm
             [[ $confirm == [yY] ]] && install_nightly
         fi
     fi

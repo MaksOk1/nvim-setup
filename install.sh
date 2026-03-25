@@ -21,7 +21,7 @@ TARGET="$HOME/.config/nvim"
 # Перевірка, чи вже встановлено щось
 if [ -e "$TARGET" ]; then
     echo -e "${YELLOW}Попередження: Конфігурація Neovim вже існує ($TARGET).${NC}"
-    read -p "Бажаєш перезаписати її? (y/n): " choice
+    read -p "Бажаєш перезаписати її? (y/N): " choice
     if [[ ! $choice =~ ^[Yy]$ ]]; then
         echo "Скасовано."
         exit 0

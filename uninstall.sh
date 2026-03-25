@@ -14,7 +14,7 @@ fi
 
 # Видалення бінарника (опціонально)
 if [ -f "/usr/local/bin/nvim" ]; then
-    read -p "Видалити встановлений nvim з /usr/local/bin? (y/n): " del_bin
+    read -p "Видалити встановлений nvim з /usr/local/bin? (y/N): " del_bin
     if [[ $del_bin == [yY] ]]; then
         sudo rm /usr/local/bin/nvim
         sudo rm -rf /opt/nvim-linux-x86_64
@@ -24,7 +24,7 @@ fi
 
 # Перевірка наявності бекапів
 if ls -d "${TARGET}_backup_"* >/dev/null 2>&1; then
-    read -p "Знайдено бекапи. Відновити останній? (y/n): " confirm
+    read -p "Знайдено бекапи. Відновити останній? (y/N): " confirm
     if [[ $confirm == [yY] ]]; then
         LATEST_BACKUP=$(ls -td ${TARGET}_backup_* | head -1)
         mv "$LATEST_BACKUP" "$TARGET"

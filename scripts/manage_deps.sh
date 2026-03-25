@@ -65,7 +65,7 @@ check_and_install_deps() {
             # Перевірка наявності Homebrew
             if ! command -v brew &> /dev/null; then
                 echo -e "${YELLOW}Homebrew не знайдено.${NC}"
-                read -p "Встановити Homebrew? (y/n): " choice
+                read -p "Встановити Homebrew? (y/N): " choice
                 if [[ $choice == [yY] ]]; then
                     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
