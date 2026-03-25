@@ -36,7 +36,7 @@ require("lazy").setup({
     },
   },
 
-  -- Treesitter (Highlighting)
+  -- Treesitter config (Highlighting)
   { 
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
@@ -74,14 +74,7 @@ require("lazy").setup({
   },
 })
 
--- Treesitter config
--- require('nvim-treesitter.configs').setup({
---   ensure_installed = { "lua", "python", "javascript", "typescript", "tsx", "bash", "dockerfile", "yaml" },
---   highlight = { enable = true },
--- })
-
 -- UI & Tooling Config
--- require("neo-tree").setup({})
 require('lualine').setup()
 require("mason").setup()
 require("mason-lspconfig").setup({
