@@ -7,6 +7,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- Some users without xclip or wl-copy on Linux systems will expirience slowness on calling: dd, dw, x, etc (on MacOS automatically supported with 'pbcopy')
 vim.opt.clipboard = 'unnamedplus'
 
 -- Plugins
@@ -55,6 +56,22 @@ require("lazy").setup({
       end
     end
   },
+
+  -- Neo-tree
+  { 
+    "nvim-neo-tree/neo-tree.nvim", 
+    branch = "v3.x", 
+    dependencies = { 
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons", -- додано сюди для стабільності
+      "MunifTanjim/nui.nvim",        -- ОБОВ'ЯЗКОВА залежність для neo-tree
+    },
+    config = function()
+      require("neo-tree").setup({
+        close_if_last_window = true,
+      })
+    end
+  },
 })
 
 -- Treesitter config
@@ -64,7 +81,7 @@ require("lazy").setup({
 -- })
 
 -- UI & Tooling Config
-require("neo-tree").setup({})
+-- require("neo-tree").setup({})
 require('lualine').setup()
 require("mason").setup()
 require("mason-lspconfig").setup({
