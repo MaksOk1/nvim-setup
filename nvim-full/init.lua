@@ -38,7 +38,8 @@ require("lazy").setup({
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     config = function()
-      require('nvim-treesitter.configs').setup({
+      local configs = require('nvim-treesitter.configs')
+      configs.setup({
         ensure_installed = { "lua", "python", "javascript", "typescript", "tsx", "bash", "dockerfile", "yaml" },
         highlight = { enable = true },
       })
@@ -52,6 +53,7 @@ require("lazy").setup({
 --   highlight = { enable = true },
 -- })
 
+-- UI & Tooling Config
 require("neo-tree").setup({})
 require('lualine').setup()
 require("mason").setup()
@@ -60,12 +62,11 @@ require("mason-lspconfig").setup({
   ensure_installed = { "pyright", "ts_ls", "dockerls", "lua_ls" },
 })
 
-local lspconfig = require("lspconfig")
+-- LSP Config
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
-
 -- Налаштування конкретних серверів
 local servers = { "pyright", "ts_ls", "dockerls", "lua_ls" }
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
 for _, lsp in ipairs(servers) do
   local opts = { capabilities = capabilities }
   
@@ -79,8 +80,12 @@ for _, lsp in ipairs(servers) do
   end
   
   -- Замість require('lspconfig')[lsp].setup(opts)
-  -- використовуємо вбудований vim.lsp.config
+  -- Використовуємо вбудований метод, щоб уникнути Deprecation Warning
   vim.lsp.config(lsp, opts)
+
+  -- Активація (якщо lspconfig завантажений)
+  local status, lspconfig = pcall(require, "lspconfig")
+  if status then lspconfig[lsp].setup(opts) end
 end
 
 -- Completion Config (CMP)
@@ -102,6 +107,7 @@ cmp.setup({
 })
 
 -- Основні гарячі клавіші для LSP
+-- Keymaps
 vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {}) -- Перейти до визначення
 vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})       -- Документація під курсором
 vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, {}) -- Code Actions
@@ -109,6 +115,7 @@ vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, {})      -- Перейме
 vim.keymap.set('n', '<leader>e', ':Neotree toggle<CR>', { desc = "Toggle Explorer" }) -- Відкрити/Закрити neotree
 
 -- Дизайн
+-- Options
 vim.cmd.colorscheme("catppuccin")
 vim.opt.number = true
 vim.opt.relativenumber = true
