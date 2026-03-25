@@ -64,3 +64,21 @@ else
     echo -e "${RED}Помилка: Папка $SOURCE_DIR не знайдена!${NC}"
     exit 1
 fi
+
+# --- АВТООНОВЛЕННЯ ---
+read -p "Увімкнути автооновлення конфігу (раз на 7 днів при старті терміналу)? (y/n): " auto_upd
+if [[ $auto_upd == [yY] ]]; then
+    SHELL_RC="$HOME/.$(basename $SHELL)rc"
+    # Fallback, якщо SHELL вказує на щось дивне
+    [[ "$SHELL" == */zsh ]] && SHELL_RC="$HOME/.zshrc"
+    [[ "$SHELL" == */bash ]] && SHELL_RC="$HOME/.bashrc"
+    
+    UPDATE_BLOCK="\n# Auto-update nvim-setup\nif [ -f \"$SCRIPT_DIR/scripts/auto_update.sh\" ]; then\n    source \"$SCRIPT_DIR/scripts/auto_update.sh\"\nfi\n"
+    
+    if ! grep -q "Auto-update nvim-setup" "$SHELL_RC" 2>/dev/null; then
+        echo -e "$UPDATE_BLOCK" >> "$SHELL_RC"
+        echo -e "${GREEN}Автооновлення успішно додано в $SHELL_RC${NC}"
+    else
+        echo -e "${YELLOW}Хук автооновлення вже існує в $SHELL_RC${NC}"
+    fi
+fi
