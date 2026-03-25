@@ -1,0 +1,6 @@
+# .gitignore
+.netrwhist
+undo/
+spell/
+shada/
+swap/
