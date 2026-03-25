@@ -6,6 +6,12 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
+# Імпорт логіки встановлення бінарника
+source ./scripts/manage_nvim_bin.sh
+
+# Перевірка версії nvim перед початком
+check_and_install_nvim
+
 TARGET="$HOME/.config/nvim"
 
 # Перевірка, чи вже встановлено щось
@@ -37,10 +43,8 @@ do
             CONF=$opt
             break
             ;;
-        "Вихід")
-            exit 0
-            ;;
-        *) echo -e "${RED}Невірний вибір${NC}";;
+        "Вихід") exit 0 ;;
+        *) echo -e "${RED}Невірний вибір${NC}" ;;
     esac
 done
 
