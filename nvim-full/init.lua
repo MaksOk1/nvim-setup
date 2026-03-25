@@ -65,11 +65,10 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 -- Налаштування конкретних серверів
 local servers = { "pyright", "ts_ls", "dockerls", "lua_ls" }
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 for _, lsp in ipairs(servers) do
---   lspconfig[lsp].setup({ capabilities = capabilities })
   local opts = { capabilities = capabilities }
   
-  -- Специфічні налаштування для Lua, щоб він "бачив" Neovim API
   if lsp == "lua_ls" then
     opts.settings = {
       Lua = {
@@ -79,7 +78,9 @@ for _, lsp in ipairs(servers) do
     }
   end
   
-  lspconfig[lsp].setup(opts)
+  -- Замість require('lspconfig')[lsp].setup(opts)
+  -- використовуємо вбудований vim.lsp.config
+  vim.lsp.config(lsp, opts)
 end
 
 -- Completion Config (CMP)
