@@ -34,15 +34,26 @@ require("lazy").setup({
   },
 
   -- Treesitter (Highlighting)
-  { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
+  { 
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    config = function()
+      require('nvim-treesitter.configs').setup({
+        ensure_installed = { "lua", "python", "javascript", "typescript", "tsx", "bash", "dockerfile", "yaml" },
+        highlight = { enable = true },
+      })
+    end
+  },
 })
 
 -- Treesitter config
-require('nvim-treesitter.configs').setup({
-  ensure_installed = { "lua", "python", "javascript", "typescript", "tsx", "bash", "dockerfile", "yaml" },
-  highlight = { enable = true },
-})
+-- require('nvim-treesitter.configs').setup({
+--   ensure_installed = { "lua", "python", "javascript", "typescript", "tsx", "bash", "dockerfile", "yaml" },
+--   highlight = { enable = true },
+-- })
 
+require("neo-tree").setup({})
+require('lualine').setup()
 require("mason").setup()
 require("mason-lspconfig").setup({
   -- Сервери для стеку
@@ -55,7 +66,20 @@ local capabilities = require('cmp_nvim_lsp').default_capabilities()
 -- Налаштування конкретних серверів
 local servers = { "pyright", "ts_ls", "dockerls", "lua_ls" }
 for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup({ capabilities = capabilities })
+--   lspconfig[lsp].setup({ capabilities = capabilities })
+  local opts = { capabilities = capabilities }
+  
+  -- Специфічні налаштування для Lua, щоб він "бачив" Neovim API
+  if lsp == "lua_ls" then
+    opts.settings = {
+      Lua = {
+        diagnostics = { globals = { "vim" } },
+        workspace = { library = vim.api.nvim_get_runtime_file("", true) },
+      }
+    }
+  end
+  
+  lspconfig[lsp].setup(opts)
 end
 
 -- Completion Config (CMP)
@@ -81,6 +105,7 @@ vim.keymap.set('n', 'gd', vim.lsp.buf.definition, {}) -- Перейти до в�
 vim.keymap.set('n', 'K', vim.lsp.buf.hover, {})       -- Документація під курсором
 vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, {}) -- Code Actions
 vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, {})      -- Перейменувати змінну
+vim.keymap.set('n', '<leader>e', ':Neotree toggle<CR>', { desc = "Toggle Explorer" }) -- Відкрити/Закрити neotree
 
 -- Дизайн
 vim.cmd.colorscheme("catppuccin")
